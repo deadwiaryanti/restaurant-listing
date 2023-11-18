@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
+    <title>Showing the map</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <!-- Mapbox library imports -->
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css" rel="stylesheet" />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js"></script>
+
+    <script src=" https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <style>
+        #map {
+            width: 100%;
+            height: 400px;
+        }
+    </style>
+
+    <script>
+        let markers = [];
+        let popups = [];
+        let map = null;
+        $(document).ready(function () {
+            mapboxgl.accessToken = "pk.eyJ1Ijoibmppa2ppcm8iLCJhIjoiY2xkMWx5bDh0MDByaDNuczV4amY2NGRlZSJ9.RrTqvVBNqAig7bdn5r2-aQ";
+            map = new mapboxgl.Map({
+                container: "map", // container ID
+                center: [106.992416, -6.241586], // starting position [lng, lat]
+                zoom: 13, // starting zoom
+                style: "mapbox://styles/mapbox/streets-v11", // style URL or style object
+                hash: true, // sync `center`, `zoom`, `pitch`, and `bearing` with URL
+                // Use `transformRequest` to modify requests that begin with `http://myHost`.
+                transformRequest: (url, resourceType) => {
+                    if (resourceType === "Source" && url.startsWith("http://myHost")) {
+                        return {
+                            url: url.replace("http", "https"),
+                            headers: { "my-custom-header": true },
+                            credentials: "include", // Include cookies for cross-origin requests
+                        };
+                    }
+                },
+            });
+
+            let nav = new mapboxgl.NavigationControl({
+                visualizePitch: true,
+            });
+            map.addControl(nav, 'bottom-right');
+        });
+
+        function get_random_position() {
+            let sign1 = Math.random() > 0.5 ? 0.1 : 1;
+            let sign2 = Math.random() > 0.5 ? -0.1 : 1;
+            return [
+                106.992416 + sign1 * Math.random(),
+                -6.241586 + sign2 * Math.random(),
+            ];
+        }
+
+        function add_randomly() {
+            let random_post = get_random_position()
+            let marker = new mapboxgl.Marker()
+                .setLngLat(random_post)
+                .addTo(map);
+            console.log(marker);
+            markers.push(marker);
+
+            let popup = new mapboxgl.Popup({
+                offset: {
+                    bottom: [0, -35],
+                },
+            })
+                .setLngLat(random_post)
+                .setHTML('<h1>hi</h1>')
+                .setMaxWidth('300px')
+                .addTo(map);
+            popups.push(popup);
+        }
+
+        function clear_elements() {
+            for (let i = 0; i < markers.lenght; i++) {
+                markers[i].remove();
+            }
+            for (let i = 0; i < popups.length; i++) {
+                popups[i].remove();
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div id="map"></div>
+    <button onclick="add_randomly()" type="button" class="btn btn-dark">Add Marker and Popup</button>
+    <button onclick="clear_elements()" type="button" class="btn btn-secondary">Clear Elements</button>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
